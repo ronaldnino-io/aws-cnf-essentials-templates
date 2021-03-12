@@ -1,0 +1,42 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: My VPC Wizard
+
+Resources:
+  secGroupName:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupName: SG-Web-Server
+      GroupDescription: Mi primer SG
+      VpcId: vpc-0834f075
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: 0.0.0.0/0
+      SecurityGroupEgress:
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: 0.0.0.0/0
+      Tags:
+        - Key: Name
+          Value: TSG-Web-Server
+  serverEC2Instance:
+    Type: AWS::EC2::Instance
+    Properties:
+      KeyName: test
+      DisableApiTermination: true
+      ImageId: ami-038f1ca1bd58a5790
+      InstanceType: t2.micro
+      Monitoring: true
+      SecurityGroupIds:
+        - !Ref secGroupName
+      UserData: !Base64 |
+        #!/bin/bash -ex
+        # put your script here
+        sudo yum -y install httpd
+        sudo service httpd start
+
+      Tags:
+        - Key: Name
+          Value: Server-Web
